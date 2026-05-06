@@ -63,3 +63,9 @@ ghc -isrc tests/Test.hs -outputdir build -o build/test.exe
 ./build/test.exe
 
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-cobalt-model-forecast-detail.ps1
+
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-cobalt-model-forecast-properties.ps1
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-cobalt-model-forecast-golden.ps1
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
