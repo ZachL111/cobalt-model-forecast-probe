@@ -1,68 +1,40 @@
 # cobalt-model-forecast-probe
 
-`cobalt-model-forecast-probe` is a focused Haskell codebase around create a Haskell reference implementation for forecast workflows, centered on incremental indexing, append-only fixtures, and checkpoint recovery checks. It is meant to be easy to inspect, run, and extend without a hosted service.
-
-## Cobalt Model Forecast Probe Walkthrough
-
-I would read the project from the outside in: command, fixture, model, then roadmap. That keeps the ml utilities idea grounded in files that can be checked locally.
+`cobalt-model-forecast-probe` explores ml utilities with a small Haskell codebase and local fixtures. The technical goal is to create a Haskell reference implementation for forecast workflows, centered on incremental indexing, append-only fixtures, and checkpoint recovery checks.
 
 ## Reason For The Project
 
-This project keeps the domain idea close to the tests. That makes it useful as a reference implementation, a small experiment, or a starting point for a more specialized tool.
+The project exists to keep a narrow engineering decision visible and testable. For this repo, that decision is how feature drift and metric stability should influence a review result.
 
-## Capabilities
+## Cobalt Model Forecast Probe Review Notes
 
-- Models feature signals with deterministic scoring and explicit review decisions.
-- Uses fixture data to keep metric checks changes visible in code review.
-- Includes extended examples for windowed behavior, including `recovery` and `degraded`.
-- Documents explainable outputs tradeoffs in `docs/operations.md`.
-- Runs locally with a single verification command and no external credentials.
+Start with `explainability` and `window width`. Those cases create the widest score spread in this repo, so they are the best quick check when the model changes.
+
+## What It Does
+
+- `fixtures/domain_review.csv` adds cases for feature drift and window width.
+- `metadata/domain-review.json` records the same cases in structured form.
+- `config/review-profile.json` captures the read order and the two review questions.
+- `examples/cobalt-model-forecast-walkthrough.md` walks through the case spread.
+- The Haskell code includes a review path for `explainability` and `window width`.
+- `docs/field-notes.md` explains the strongest and weakest cases.
 
 ## How It Is Put Together
 
-The interesting part is the boundary between accepted and reviewed scenarios. Extended examples sit near that boundary so future edits can show whether the model became more permissive or more cautious. The Haskell code keeps the pure scoring function isolated so tests can check it without setup.
+The implementation keeps the scoring rule plain: reward signal and confidence, preserve slack, penalize drag, then classify the result into a review lane.
 
-## Where Things Live
+The Haskell implementation avoids hidden state so fixture changes are easy to reason about.
 
-- `src`: primary implementation
-- `tests`: verification harness
-- `fixtures`: compact golden scenarios
-- `examples`: expanded scenario set
-- `metadata`: project constants and verification metadata
-- `docs`: operations and extension notes
-- `scripts`: local verification and audit commands
-
-## Getting It Running
-
-Clone the repository, enter the directory, and run the verifier. No database server, cloud account, or token is required.
-
-## Command Examples
+## Run It
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify.ps1
 ```
 
-This runs the language-level build or test path against the compact fixture set.
+## Check It
 
-## Check The Work
+The same command runs the local verification path. The highest-scoring domain case is `recovery` at 206, which lands in `ship`. The most cautious case is `stress` at 103, which lands in `hold`.
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/audit.ps1
-```
+## Boundaries
 
-The audit command checks repository structure and README constraints before it delegates to the verifier.
-
-## Data Notes
-
-`examples/extended_cases.csv` adds six named cases. I kept the names plain so failures are easy to read in a terminal: baseline, pressure, surge, degraded, recovery, and boundary.
-
-## Tradeoffs
-
-This code is local-first. It makes no claim about deployed usage and avoids credentials, hosted state, and environment-specific setup.
-
-## Possible Extensions
-
-- Add a comparison mode that shows how decisions change when one signal is adjusted.
-- Add a loader for `examples/extended_cases.csv` and promote selected cases into the language test suite.
-- Add a short report command that prints the score breakdown for a single scenario.
-- Add one more ml utilities fixture that focuses on a malformed or borderline input.
+No external service is required. A deeper version would add more negative cases and a clearer boundary around invalid input.

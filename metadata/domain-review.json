@@ -1,0 +1,73 @@
+{
+  "repo": "cobalt-model-forecast-probe",
+  "language": "Haskell",
+  "category": "ML utilities",
+  "goal": "Create a Haskell reference implementation for forecast workflows, centered on incremental indexing, append-only fixtures, and checkpoint recovery checks.",
+  "review_model": {
+    "terms": [
+      "feature drift",
+      "window width",
+      "metric stability",
+      "explainability"
+    ],
+    "lanes": [
+      "ship",
+      "watch",
+      "hold"
+    ],
+    "score": "signal * 2 + slack + confidence - drag * 3",
+    "purpose": "surface the domain-specific cases that need the most careful review"
+  },
+  "cases": [
+    {
+      "name": "baseline",
+      "focus": "feature drift",
+      "signal": 51,
+      "slack": 23,
+      "drag": 22,
+      "confidence": 54,
+      "score": 113,
+      "lane": "watch"
+    },
+    {
+      "name": "stress",
+      "focus": "window width",
+      "signal": 49,
+      "slack": 24,
+      "drag": 26,
+      "confidence": 59,
+      "score": 103,
+      "lane": "hold"
+    },
+    {
+      "name": "edge",
+      "focus": "metric stability",
+      "signal": 46,
+      "slack": 44,
+      "drag": 11,
+      "confidence": 73,
+      "score": 176,
+      "lane": "ship"
+    },
+    {
+      "name": "recovery",
+      "focus": "explainability",
+      "signal": 69,
+      "slack": 36,
+      "drag": 19,
+      "confidence": 89,
+      "score": 206,
+      "lane": "ship"
+    },
+    {
+      "name": "stale",
+      "focus": "feature drift",
+      "signal": 59,
+      "slack": 29,
+      "drag": 27,
+      "confidence": 68,
+      "score": 134,
+      "lane": "watch"
+    }
+  ]
+}
